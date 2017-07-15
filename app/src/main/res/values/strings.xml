@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">Inventory App</string>
+
+    <string name="detail_activity_title_new_product">Add a product</string>
+
+    <string name="detail_activity_title_edit_product">Edit product</string>
+
+    <string name="order_btn">Order</string>
+
+    <string name="insert_product_failed">The product was not added.</string>
+
+    <string name="insert_product_successful">The product was successfully added.</string>
+
+    <string name="delete_product_successful">The product was successfully deleted.</string>
+
+    <string name="delete_product_failed">The product was not deleted.</string>
+
+    <string name="update_product_successful">The product was successfully updated.</string>
+
+    <string name="update_product_failed">The product was not updated.</string>
+
+    <string name="add_product">Add</string>
+
+    <string name="delete_product">Delete product</string>
+
+    <string name="save_product">Save product</string>
+
+    <string name="sale_button">Sale</string>
+
+    <string name="instructions_empty_textView">There are no products. \nTo add new products, press the Add product button from the menu.</string>
+
+    <string name="title_activity_insert">InsertActivity</string>
+
+    <string name="name_label">Name</string>
+
+    <string name="quantity_label">Quantity</string>
+
+    <string name="price_label">Price</string>
+
+    <string name="supplier_label">Supplier</string>
+
+    <string name="image_label">Image</string>
+
+    <string name="no_negative_quantity">The quantity cannot be less than 0.</string>
+
+    <string name="quantity_change">Change the quantity</string>
+
+    <string name="image_of_product">Product Image</string>
+
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <string name="discard">Discard</string>
+
+    <string name="keep_editing">Keep Editing</string>
+
+    <string name="delete_dialog_msg">Delete this product?</string>
+
+    <string name="delete">Delete</string>
+
+    <string name="cancel">Cancel</string>
+
+    <string name="required_product_name">The product requires a name.</string>
+
+    <string name="required_product_price">The product requires a price.</string>
+
+    <string name="required_product_quantity">The product requires a quantity.</string>
+
+    <string name="required_product_image">The product requires an image.</string>
+
+</resources>

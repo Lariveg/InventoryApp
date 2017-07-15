@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?><!-- further details for each inventory item. This includes an item image,
+Quantity add/remove buttons, an Order button, a Delete button, and an edit button. -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".DetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/activity_margin">
+
+        <ImageView
+            android:id="@+id/product_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/activity_margin"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <!-- Name fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Label -->
+            <TextView
+                style="@style/CategoryStyle"
+                android:text="@string/name_label" />
+
+            <!-- Name field -->
+            <EditText
+                android:id="@+id/edit_product_name"
+                android:hint="@string/name_label"
+                android:inputType="textCapWords"
+                style="@style/EditorFieldStyle" />
+
+        </LinearLayout>
+
+        <!-- Price fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Label -->
+            <TextView
+                style="@style/CategoryStyle"
+                android:text="@string/price_label" />
+
+            <!-- Price field -->
+            <EditText
+                android:id="@+id/edit_product_price"
+                android:hint="@string/price_label"
+                android:inputType="numberDecimal"
+                style="@style/EditorFieldStyle" />
+
+        </LinearLayout>
+
+        <!-- Quantity fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Label -->
+            <TextView
+                style="@style/CategoryStyle"
+                android:text="@string/quantity_label" />
+
+            <!-- Quantity field -->
+            <EditText
+                android:id="@+id/edit_product_quantity"
+                android:hint="@string/quantity_label"
+                android:inputType="number"
+                style="@style/EditorFieldStyle" />
+
+        </LinearLayout>
+
+        <!-- Supplier fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Label -->
+            <TextView
+                style="@style/CategoryStyle"
+                android:text="@string/supplier_label" />
+
+            <!-- Supplier field -->
+            <EditText
+                android:id="@+id/edit_product_supplier"
+                android:hint="@string/supplier_label"
+                android:inputType="textCapWords"
+                style="@style/EditorFieldStyle" />
+
+        </LinearLayout>
+
+        <!-- Image fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/activity_margin">
+
+            <!-- Label -->
+            <TextView
+                style="@style/CategoryStyle"
+                android:text="@string/image_label" />
+
+            <!-- Image field -->
+            <ImageButton
+                android:id="@+id/edit_product_image"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:onClick="addImage"
+                android:background="@drawable/image_add"
+                />
+
+        </LinearLayout>
+
+        <!-- Change quantity fields -->
+        <RelativeLayout
+            android:id="@+id/change_quantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/activity_margin">
+
+            <TextView
+                android:id="@+id/quantity_text_view"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textSize="@dimen/display_quantity"
+                android:textColor="@color/textColor"
+                tools:text="5" />
+
+            <ImageButton
+                android:layout_height="30dp"
+                android:layout_width="30dp"
+                android:layout_toLeftOf="@id/quantity_text_view"
+                android:layout_marginRight="@dimen/big_margin"
+                android:onClick="decreaseQuantity"
+                android:src="@drawable/minus_sign" />
+
+            <ImageButton
+                android:layout_height="30dp"
+                android:layout_width="30dp"
+                android:layout_toRightOf="@id/quantity_text_view"
+                android:layout_marginLeft="@dimen/big_margin"
+                android:onClick="increaseQuantity"
+                android:src="@drawable/plus_sign" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/order_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_margin"
+            android:onClick="submitOrder"
+            android:text="@string/order_btn"/>
+
+        <Button
+            android:id="@+id/delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="deleteButton"
+            android:text="@string/delete_product"/>
+
+    </LinearLayout>
+
+</ScrollView>
