@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,7 +33,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //Setup the sale button
     public void onSalePress(View view) {
         ContentResolver resolver = getContentResolver();
-        int currentProductId = view.getId();
+
+        Button saleButton = (Button) view;
+        int currentProductId = Integer.parseInt(saleButton.getTag().toString());
 
         Uri uri = Uri.parse("content://com.example.android.inventoryapp/inventory/"
                 + String.valueOf(currentProductId));
