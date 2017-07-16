@@ -31,7 +31,6 @@ import com.example.android.inventoryapp.data.StoreContract.InventoryEntry;
 
 import java.io.IOException;
 
-
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
