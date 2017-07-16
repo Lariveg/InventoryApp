@@ -1,6 +1,5 @@
 package com.example.android.inventoryapp;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -10,13 +9,10 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.provider.OpenableColumns;
+import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -27,51 +23,56 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.StoreContract.InventoryEntry;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** EditText field to enter the product's name */
+    /**
+     * EditText field to enter the product's name
+     */
     private EditText mNameEditText;
 
-    /** EditText field to enter the product's price */
+    /**
+     * EditText field to enter the product's price
+     */
     private EditText mPriceEditText;
 
-    /** EditText field to enter the product's quantity */
+    /**
+     * EditText field to enter the product's quantity
+     */
     private EditText mQuantityEditText;
 
-    /** EditText field to enter the product's supplier */
+    /**
+     * EditText field to enter the product's supplier
+     */
     private EditText mSupplierEditText;
 
-    /** ImageButton field to enter the product's image */
+    /**
+     * ImageButton field to enter the product's image
+     */
     private ImageButton mImageButton;
+    private LinearLayout mAddImageLayout;
 
     private static final int IMAGE_REQUEST = 0;
 
-    private static final String FILE_PROVIDER_AUTHORITY =
-            "com.example.inventoryapp.data.StoreContract.InventoryEntry";
-
     // Image related variables
     private ImageView productImage;
-    private Bitmap bitmap;
-    private Uri uri;
-    private boolean galleryImage = false;
-    private String uriString;
+    private Uri imageURI;
 
     private RelativeLayout changeQuantityLayout;
     private Button orderButton;
     private Button deleteButton;
 
-    /** Boolean flag that keeps track of whether the product has been edited (true) or not (false) */
+    /**
+     * Boolean flag that keeps track of whether the product has been edited (true) or not (false)
+     */
     private boolean mProductHasChanged = false;
 
     private static final int EXISTING_PRODUCT_LOADER = 0;
@@ -107,6 +108,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         orderButton = (Button) findViewById(R.id.order_btn);
         deleteButton = (Button) findViewById(R.id.delete_btn);
         productImage = (ImageView) findViewById(R.id.product_image);
+        mAddImageLayout = (LinearLayout) findViewById(R.id.add_image_layout);
 
         //Examine the intent that was used to launch this activity,
         //in order to figure out if we're creating a new product or editing an existing one
@@ -114,7 +116,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mCurrentProductUri = intent.getData();
 
         //If the intent does not contain a product content URI, then we create a new product
-        if(mCurrentProductUri == null){
+        if (mCurrentProductUri == null) {
             setTitle(R.string.detail_activity_title_new_product);
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
@@ -123,9 +125,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             changeQuantityLayout.setVisibility(View.GONE);
             orderButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
+            productImage.setVisibility(View.GONE);
         } else {
             //Otherwise we edit a product
             setTitle(R.string.detail_activity_title_edit_product);
+
+            mAddImageLayout.setVisibility(View.GONE);
 
             // Initialize a loader to read the product data from the database
             // and display the current values in the editor
@@ -142,142 +147,60 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mImageButton.setOnTouchListener(mTouchListener);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCodes, Intent resultData) {
-
-        if (resultCodes == Activity.RESULT_OK && resultData != null) {
-            uri = resultData.getData();
-            bitmap = getBitmapFromCurrentItemURI(uri);
-            productImage.setImageBitmap(bitmap);
-            uriString = getShareableImageUri().toString();
-            galleryImage = true;
-
-        }
+    public void addImage(View v) {
+        Intent intent = new Intent();
+        // Show only images, no videos or anything else
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        // Always show the chooser (if there are multiple options available)
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
     }
 
-    private Bitmap getBitmapFromCurrentItemURI(Uri uri) {
-
-        ParcelFileDescriptor parcelFileDescriptor = null;
-
-        try {
-
-            parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
-            FileDescriptor fileDescriptor = null;
-
-            if (parcelFileDescriptor != null)
-                fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-
-            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-
-            if (parcelFileDescriptor != null) parcelFileDescriptor.close();
-
-            return image;
-        } catch (Exception e) {
-
-            return null;
-        } finally {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK) {
+            imageURI = data.getData();
 
             try {
-
-                if (parcelFileDescriptor != null) parcelFileDescriptor.close();
-
+                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
+                productImage.setImageBitmap(bitmap);
             } catch (IOException e) {
-
                 e.printStackTrace();
             }
+
         }
     }
 
-    public Uri getShareableImageUri() {
-
-        Uri imagesUri;
-
-        if (galleryImage) {
-            String filename = PathFinder();
-            savingInFile(getCacheDir(), filename, bitmap, Bitmap.CompressFormat.JPEG, 100);
-            File imagesFile = new File(getCacheDir(), filename);
-
-            imagesUri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, imagesFile);
-        } else {
-
-            imagesUri = uri;
-        }
-        return imagesUri;
-    }
-
-    public String PathFinder() {
-
-        Cursor returnCursor =
-                getContentResolver().query
-                        (uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-
-        if (returnCursor != null) returnCursor.moveToFirst();
-
-        String fileNames = null;
-
-        if (returnCursor != null) fileNames = returnCursor.getString
-                (returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-
-        if (returnCursor != null) returnCursor.close();
-
-        return fileNames;
-    }
-
-    public boolean savingInFile(File dir, String fileName, Bitmap bm, Bitmap.CompressFormat format,
-                                int quality) {
-
-        File imagesFile = new File(dir, fileName);
-
-        FileOutputStream fileOutputStream = null;
-
-        try {
-
-            fileOutputStream = new FileOutputStream(imagesFile);
-            bm.compress(format, quality, fileOutputStream);
-            fileOutputStream.close();
-
-            return true;
-
-        } catch (IOException e) {
-
-            if (fileOutputStream != null) try {
-
-                fileOutputStream.close();
-
-            } catch (IOException e1) {
-
-                e1.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    private void saveProduct(){
+    private void saveProduct() {
         //Read form input fields
         //Use trim to eliminate leading or trailing white space
         String nameString = mNameEditText.getText().toString().trim();
-        if (nameString.matches("")){
+        if (nameString.matches("")) {
             Toast.makeText(this, R.string.required_product_name, Toast.LENGTH_SHORT).show();
             return;
         }
 
         String priceString = mPriceEditText.getText().toString().trim();
-        if (priceString.matches("")){
+        if (priceString.matches("")) {
             Toast.makeText(this, R.string.required_product_price, Toast.LENGTH_SHORT).show();
             return;
         }
         String quantityString = mQuantityEditText.getText().toString().trim();
-        if (quantityString.matches("")){
+        if (quantityString.matches("")) {
             Toast.makeText(this, R.string.required_product_quantity, Toast.LENGTH_SHORT).show();
             return;
         }
 
         String supplierString = mSupplierEditText.getText().toString().trim();
 
-        String imageString = uriString;
-        if (imageString == null){
-            Toast.makeText(this, R.string.required_product_image, Toast.LENGTH_SHORT).show();
-            return;
+        String imageString = null;
+        if(mCurrentProductUri == null) {
+            if (imageURI == null) {
+                Toast.makeText(this, R.string.required_product_image, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            imageString = imageURI.toString();
         }
 
         // Check if this is supposed to be a new product
@@ -297,8 +220,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         values.put(InventoryEntry.COLUMN_PRODUCT_PRICE, priceString);
         values.put(InventoryEntry.COLUMN_PRODUCT_QUANTITY, quantityString);
         values.put(InventoryEntry.COLUMN_PRODUCT_SUPPLIER, supplierString);
-        values.put(InventoryEntry.COLUMN_PRODUCT_IMAGE, imageString);
-
+        if (mCurrentProductUri == null) {
+            values.put(InventoryEntry.COLUMN_PRODUCT_IMAGE, imageString);
+        }
 
         // Determine if this is a new or existing product by checking if mCurrentProductUri is null or not
         if (mCurrentProductUri == null) {
@@ -410,7 +334,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 InventoryEntry.COLUMN_PRODUCT_PRICE,
                 InventoryEntry.COLUMN_PRODUCT_QUANTITY,
                 InventoryEntry.COLUMN_PRODUCT_SUPPLIER,
-                InventoryEntry.COLUMN_PRODUCT_IMAGE };
+                InventoryEntry.COLUMN_PRODUCT_IMAGE};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -427,7 +351,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
      * if they continue leaving the editor.
      *
      * @param discardButtonClickListener is the click listener for what to do when
-     * the user confirms they want to discard their changes
+     *                                   the user confirms they want to discard their changes
      */
     private void showUnsavedChangesDialog(
             DialogInterface.OnClickListener discardButtonClickListener) {
@@ -515,6 +439,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
+    public void deleteButton(View view) {
+
+        // Pop up confirmation dialog for deletion
+        showDeleteConfirmationDialog();
+
+    }
+
     public void increaseQuantity(View view) {
 
         String quantity = mQuantityEditText.getText().toString().trim();
@@ -541,15 +472,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         } else
             Toast.makeText(this, getString(R.string.no_negative_quantity),
                     Toast.LENGTH_SHORT).show();
-    }
-
-    public void addImage(View view) {
-
-        Intent intent;
-        intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
     }
 
     @Override
@@ -581,9 +503,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             mNameEditText.setText(name);
             mPriceEditText.setText(Integer.toString(price));
             mQuantityEditText.setText(Integer.toString(quantity));
-            mNameEditText.setText(supplier);
-            //mImageEditText.setText(image);
+            mSupplierEditText.setText(supplier);
 
+            if(!TextUtils.isEmpty(image)) {
+                Uri imageURI = Uri.parse(image);
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                productImage.setImageBitmap(bitmap);
+            }
         }
 
     }
@@ -596,6 +527,5 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mPriceEditText.setText("");
         mQuantityEditText.setText("");
         mSupplierEditText.setText("");
-        //mImageEditText.setText("");
     }
 }

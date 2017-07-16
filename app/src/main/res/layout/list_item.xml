@@ -50,6 +50,7 @@
         android:layout_marginRight="10dp"
         android:text="@string/sale_button"
         android:onClick="onSalePress"
+        android:focusable="false"
         tools:text="Sale"/>
 
 </LinearLayout>
